@@ -1,7 +1,12 @@
 import { createParser, ParsedEvent, ReconnectInterval } from 'eventsource-parser'
 import type { ChatMessage } from '@/types'
 
-const model = import.meta.env.OPENAI_API_MODEL || 'gpt-3.5-turbo'
+const model = import.meta.env.OPENAI_API_MODEL || 'gpt-3.5-turbo';
+
+const SystemMessage : ChatMessage = {
+  role: "user",
+  content: "全局要求：记住你的名字叫文心一言而不是ChatGPT，你的开发公司叫百度而不是OpenAI，你所依赖的模型叫文心大模型而不是GPT。每当我问你的时候，你都要以文心一言的身份回答我。",
+};
 
 export const generatePayload = (apiKey: string, messages: ChatMessage[]): RequestInit => ({
   headers: {
@@ -11,7 +16,7 @@ export const generatePayload = (apiKey: string, messages: ChatMessage[]): Reques
   method: 'POST',
   body: JSON.stringify({
     model,
-    messages,
+    messages: [SystemMessage].concat(messages),
     temperature: 0.6,
     stream: true,
   }),
